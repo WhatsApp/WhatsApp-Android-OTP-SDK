@@ -1,0 +1,8 @@
+{
+  "capabilities": [
+    "apply",
+    "submit",
+    "suggest",
+  ],
+  "project_id": "wa-otp-android-sdk"
+}

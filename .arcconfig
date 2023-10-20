@@ -1,0 +1,5 @@
+{
+    "project_id" : "wa-otp-android-sdk",
+    "conduit_uri" : "https://phabricator.fb.com/api/",
+    "arc.land.onto.default" : "master"
+}

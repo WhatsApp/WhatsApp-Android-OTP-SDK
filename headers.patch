@@ -1,0 +1,211 @@
+Fri Oct 20 15:16:42 2023 -0700 4dcddab (HEAD -> master) [headers] adding copyright headers to all files  [Lucas Frossard]
+diff --git a/build.gradle b/build.gradle
+index fa0a9f8..6330052 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ // Top-level build file where you can add configuration options common to all sub-projects/modules.
+ plugins {
+     id 'com.android.library' version '7.4.0' apply false
+diff --git a/sdk/build.gradle b/sdk/build.gradle
+index 46c7ea3..eee5a7a 100644
+--- a/sdk/build.gradle
++++ b/sdk/build.gradle
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ plugins {
+     id 'com.android.library'
+     id 'checkstyle'
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandler.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandler.java
+index e1da201..e6625e0 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandler.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandler.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import android.content.Context;
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandler.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandler.java
+index 1b8d6f6..1a57780 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandler.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandler.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import android.app.PendingIntent;
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilder.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilder.java
+index ada175b..34eb61f 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilder.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilder.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import android.app.PendingIntent;
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtils.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtils.java
+index 356eef6..af27f43 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtils.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtils.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import android.content.ComponentName;
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/data/DebugSignal.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/data/DebugSignal.java
+index f3e4f77..5b58610 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/data/DebugSignal.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/data/DebugSignal.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk.data;
+ 
+ /**
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppClientType.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppClientType.java
+index 8031b1e..8c8587f 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppClientType.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppClientType.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk.enums;
+ 
+ public enum WhatsAppClientType {
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppOtpError.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppOtpError.java
+index 1a7b7eb..ec43ac6 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppOtpError.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/enums/WhatsAppOtpError.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk.enums;
+ 
+ public enum WhatsAppOtpError {
+diff --git a/sdk/src/main/java/com/whatsapp/otp/android/sdk/exceptions/InvalidWhatsAppOtpIntentException.java b/sdk/src/main/java/com/whatsapp/otp/android/sdk/exceptions/InvalidWhatsAppOtpIntentException.java
+index f4fb97a..b9c6527 100644
+--- a/sdk/src/main/java/com/whatsapp/otp/android/sdk/exceptions/InvalidWhatsAppOtpIntentException.java
++++ b/sdk/src/main/java/com/whatsapp/otp/android/sdk/exceptions/InvalidWhatsAppOtpIntentException.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk.exceptions;
+ 
+ import androidx.annotation.NonNull;
+diff --git a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandlerTest.java b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandlerTest.java
+index 659a391..6a2b83e 100644
+--- a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandlerTest.java
++++ b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpHandlerTest.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+diff --git a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandlerTest.java b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandlerTest.java
+index 25b68e8..9cbae60 100644
+--- a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandlerTest.java
++++ b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIncomingIntentHandlerTest.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+diff --git a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilderTest.java b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilderTest.java
+index d58f687..29032c1 100644
+--- a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilderTest.java
++++ b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpIntentBuilderTest.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+diff --git a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtilsTest.java b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtilsTest.java
+index 6dfcfb7..f8ff48e 100644
+--- a/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtilsTest.java
++++ b/sdk/src/test/java/com/whatsapp/otp/android/sdk/WhatsAppOtpUtilsTest.java
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ package com.whatsapp.otp.android.sdk;
+ 
+ import static org.mockito.ArgumentMatchers.eq;
+diff --git a/settings.gradle b/settings.gradle
+index 1e2d11b..79c6293 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -1,3 +1,9 @@
++/**
++ * Copyright (c) Meta Platforms, Inc. and affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
+ pluginManagement {
+     repositories {
+         gradlePluginPortal()
