@@ -10,6 +10,8 @@ plugins {
     id 'maven-publish'
 }
 
+apply from: 'release.gradle'
+
 android {
     namespace 'com.whatsapp.otp.android.sdk'
     compileSdk 33
@@ -43,23 +45,4 @@ dependencies {
     testImplementation "org.assertj:assertj-core:3.23.1"
     testImplementation 'androidx.test:core:1.5.0'
     androidTestImplementation 'junit:junit:4.13.2'
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = "com.whatsapp.otp"
-            artifactId = "whatsapp-otp-android-sdk"
-            version = "0.1.0"
-
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
-    }
-    repositories {
-        maven {
-            mavenLocal()
-        }
-    }
 }
