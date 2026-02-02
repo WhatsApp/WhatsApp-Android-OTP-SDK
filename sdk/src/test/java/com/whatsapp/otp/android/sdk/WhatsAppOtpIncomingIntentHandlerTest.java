@@ -9,18 +9,18 @@ package com.whatsapp.otp.android.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import com.whatsapp.otp.android.sdk.data.DebugSignal;
-import com.whatsapp.otp.android.sdk.enums.WhatsAppClientType;
 import com.whatsapp.otp.android.sdk.enums.WhatsAppOtpError;
-import com.whatsapp.otp.android.sdk.exceptions.InvalidWhatsAppOtpIntentException;
+import com.whatsapp.otp.android.sdk.exceptions.HandshakeIdInvalidFormatException;
+import com.whatsapp.otp.android.sdk.exceptions.HandshakeIdMismatchException;
+import com.whatsapp.otp.android.sdk.exceptions.HandshakeIdMissingException;
+
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.junit.Test;
@@ -31,90 +31,19 @@ public class WhatsAppOtpIncomingIntentHandlerTest {
 
   private static final String CODE = "567567";
   private static final String CODE_KEY = "code";
-  private static final String CALLER_INFO = "_ci_";
   private static final String OTP_ERROR_IDENTIFIER_KEY = "error";
   private static final String OTP_ERROR_MESSAGE_KEY = "error_message";
+  private static final UUID REQUEST_ID = UUID.randomUUID();
+  private static final String REQUEST_ID_KEY = "request_id";
+
 
   private Intent mockedIntent = Mockito.mock(Intent.class);
-  private PendingIntent mockedPendingIntent = Mockito.mock(PendingIntent.class);
-  private Consumer<String> mockedCodeConsumer = Mockito.mock(Consumer.class);
   private Consumer<DebugSignal> mockedDebugCodeConsumer = Mockito.mock(Consumer.class);
   private BiConsumer<WhatsAppOtpError, Exception> mockedErrorConsumer = Mockito.mock(
       BiConsumer.class);
+  private Consumer<String> mockedSingleCodeConsumer = Mockito.mock(Consumer.class);
 
   private WhatsAppOtpIncomingIntentHandler incomingIntentHandler = new WhatsAppOtpIncomingIntentHandler();
-
-  @Test
-  public void test_getOtpCodeFromWhatsAppIntent_succeeds() {
-    // setup
-    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
-    mockIntentWithPendingIntentFromPackage(WhatsAppClientType.BUSINESS.getPackageName());
-
-    // test
-    String otpCodeFromWhatsAppIntent = incomingIntentHandler.getOtpCodeFromWhatsAppIntent(
-        mockedIntent);
-
-    // assertions
-    assertThat(otpCodeFromWhatsAppIntent).isEqualTo("567567");
-  }
-
-  @Test
-  public void test_processOtpCode_succeeds() {
-    // setup
-    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
-    mockIntentWithPendingIntentFromPackage(WhatsAppClientType.BUSINESS.getPackageName());
-
-    // test
-    incomingIntentHandler.processOtpCode(mockedIntent, mockedCodeConsumer, mockedErrorConsumer);
-
-    // assertions
-    verify(mockedCodeConsumer).accept(eq(CODE));
-    verify(mockedErrorConsumer, never()).accept(any(), any());
-  }
-
-  @Test
-  public void test_processOtpCode_failsIntentNotFromWhatsApp() {
-    // setup
-    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
-    mockIntentWithPendingIntentFromPackage("com.not.from.wa");
-
-    // test
-    incomingIntentHandler.processOtpCode(mockedIntent, mockedCodeConsumer, mockedErrorConsumer);
-
-    // assertions
-    verify(mockedCodeConsumer, never()).accept(any());
-    verify(mockedErrorConsumer).accept(eq(WhatsAppOtpError.INTENT_IS_NOT_FROM_WHATSAPP),
-        any(InvalidWhatsAppOtpIntentException.class));
-  }
-
-  @Test
-  public void test_processOtpCode_failsWithGenericException() {
-    // setup
-    doThrow(new RuntimeException()).when(mockedIntent).getParcelableExtra(eq(CALLER_INFO));
-    doReturn(WhatsAppClientType.BUSINESS.getPackageName()).when(mockedPendingIntent)
-        .getCreatorPackage();
-
-    // test
-    incomingIntentHandler.processOtpCode(mockedIntent, mockedCodeConsumer, mockedErrorConsumer);
-
-    // assertions
-    verify(mockedCodeConsumer, never()).accept(any());
-    verify(mockedErrorConsumer).accept(eq(WhatsAppOtpError.GENERIC_EXCEPTION),
-        any(RuntimeException.class));
-
-  }
-
-  @Test
-  public void test_processOtpCode_failsMissingCode() {
-    mockIntentWithPendingIntentFromPackage(WhatsAppClientType.CONSUMER.getPackageName());
-
-    // test
-    incomingIntentHandler.processOtpCode(mockedIntent, mockedCodeConsumer, mockedErrorConsumer);
-
-    // assertions
-    verify(mockedCodeConsumer, never()).accept(any());
-    verify(mockedErrorConsumer).accept(eq(WhatsAppOtpError.OTP_CODE_NOT_RECEIVED), isNull());
-  }
 
   @Test
   public void test_getOtpDebugFromWhatsAppIntent_succeeds() {
@@ -148,94 +77,127 @@ public class WhatsAppOtpIncomingIntentHandlerTest {
     assertThat(debugSignal.otpErrorMessage).isEqualTo("message");
   }
 
+  @Test
+  public void test_isIntentFromWhatsApp_withMatchingHandshakeId_returnsTrue() {
+    // setup
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+
+    // test
+    boolean result = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent, REQUEST_ID.toString());
+
+    // assertions
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void test_isIntentFromWhatsApp_withMismatchedHandshakeId_returnsFalse() {
+    // setup
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+    String differentHandshakeId = UUID.randomUUID().toString();
+
+    // test
+    boolean result = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent, differentHandshakeId);
+
+    // assertions
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void test_isIntentFromWhatsApp_withMissingHandshakeId_returnsFalse() {
+    // setup - no handshake ID in intent
+
+    // test
+    boolean result = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent, REQUEST_ID.toString());
+
+    // assertions
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void test_isIntentFromWhatsApp_withInvalidHandshakeId_returnsFalse() {
+    // setup
+    doReturn("invalid-uuid").when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+
+    // test
+    boolean result = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent, REQUEST_ID.toString());
+
+    // assertions
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void test_processOtpCode_withExpectedHandshakeId_succeeds() {
+    // setup
+    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+
+    // test
+    incomingIntentHandler.processOtpCode(mockedIntent, REQUEST_ID.toString(), mockedSingleCodeConsumer, mockedErrorConsumer);
+
+    // assertions
+    verify(mockedSingleCodeConsumer).accept(eq(CODE));
+    verify(mockedErrorConsumer, never()).accept(any(), any());
+  }
+
+  @Test
+  public void test_processOtpCode_withMismatchedHandshakeId_fails() {
+    // setup
+    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+    String differentHandshakeId = UUID.randomUUID().toString();
+
+    // test
+    incomingIntentHandler.processOtpCode(mockedIntent, differentHandshakeId, mockedSingleCodeConsumer, mockedErrorConsumer);
+
+    // assertions
+    verify(mockedSingleCodeConsumer, never()).accept(any());
+    verify(mockedErrorConsumer).accept(eq(WhatsAppOtpError.HANDSHAKE_ID_MISMATCH), any(HandshakeIdMismatchException.class));
+  }
+
+  @Test
+  public void test_getOtpCodeFromWhatsAppIntent_withExpectedHandshakeId_succeeds() {
+    // setup
+    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+
+    // test
+    String result = incomingIntentHandler.getOtpCodeFromWhatsAppIntent(mockedIntent, REQUEST_ID.toString());
+
+    // assertions
+    assertThat(result).isEqualTo(CODE);
+  }
+
+  @Test(expected = HandshakeIdMismatchException.class)
+  public void test_getOtpCodeFromWhatsAppIntent_withMismatchedHandshakeId_throwsHandshakeIdMismatchException() {
+    // setup
+    doReturn(CODE).when(mockedIntent).getStringExtra(CODE_KEY);
+    doReturn(REQUEST_ID.toString()).when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+    String differentHandshakeId = UUID.randomUUID().toString();
+
+    // test - should throw HandshakeIdMismatchException
+    incomingIntentHandler.getOtpCodeFromWhatsAppIntent(mockedIntent, differentHandshakeId);
+  }
+
+  @Test(expected = HandshakeIdMissingException.class)
+  public void test_getOtpCodeFromWhatsAppIntent_withMissingHandshakeId_throwsHandshakeIdMissingException() {
+    // setup - no handshake ID in intent
+
+    // test - should throw HandshakeIdMissingException
+    incomingIntentHandler.getOtpCodeFromWhatsAppIntent(mockedIntent, REQUEST_ID.toString());
+  }
+
+  @Test(expected = HandshakeIdInvalidFormatException.class)
+  public void test_getOtpCodeFromWhatsAppIntent_withInvalidHandshakeId_throwsHandshakeIdInvalidFormatException() {
+    // setup
+    doReturn("invalid-uuid").when(mockedIntent).getStringExtra(REQUEST_ID_KEY);
+
+    // test - should throw HandshakeIdInvalidFormatException
+    incomingIntentHandler.getOtpCodeFromWhatsAppIntent(mockedIntent, REQUEST_ID.toString());
+  }
+
   private Intent mockWhatsAppIntentWithOtpError() {
     doReturn("key").when(mockedIntent).getStringExtra(OTP_ERROR_IDENTIFIER_KEY);
     doReturn("message").when(mockedIntent).getStringExtra(OTP_ERROR_MESSAGE_KEY);
-    doReturn(mockedPendingIntent).when(mockedIntent).getParcelableExtra(eq(CALLER_INFO));
-    doReturn(WhatsAppClientType.BUSINESS.getPackageName()).when(mockedPendingIntent)
-        .getCreatorPackage();
     return mockedIntent;
-  }
-
-  @Test
-  public void test_isIntentFromWhatsApp_itIs() {
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isTrue();
-  }
-
-
-  @Test
-  public void test_isIntentFromWhatsAppConsumer_itIs() {
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent,
-        WhatsAppClientType.CONSUMER);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isTrue();
-  }
-
-  @Test
-  public void test_isIntentFromWhatsAppBusiness_itIs() {
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp.w4b");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent,
-        WhatsAppClientType.BUSINESS);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isTrue();
-  }
-
-  @Test
-  public void test_isIntentFromWhatsAppBusinessOrConsumer_itIs() {
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp.w4b");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent,
-        WhatsAppClientType.BUSINESS, WhatsAppClientType.CONSUMER);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isTrue();
-  }
-
-  @Test
-  public void test_isIntentFromWhatsApp_itIsNot() {
-    mockIntentWithPendingIntentFromPackage("com.not.from.wa");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isFalse();
-  }
-
-  @Test
-  public void test_isIntentFromWhatsAppConsumer_itIsNot() {
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp.w4b");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent,
-        WhatsAppClientType.CONSUMER);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isFalse();
-  }
-
-  @Test
-  public void test_isIntentFromWhatsAppBusiness_itIsNot() {
-
-    // setup
-    mockIntentWithPendingIntentFromPackage("com.whatsapp");
-    // test
-    boolean isIntentFromWhatsApp = incomingIntentHandler.isIntentFromWhatsApp(mockedIntent,
-        WhatsAppClientType.BUSINESS);
-    // assertions
-    assertThat(isIntentFromWhatsApp).isFalse();
-  }
-
-  private void mockIntentWithPendingIntentFromPackage(String packageSource) {
-    doReturn(mockedPendingIntent).when(mockedIntent).getParcelableExtra(eq(CALLER_INFO));
-    doReturn(packageSource).when(mockedPendingIntent)
-        .getCreatorPackage();
   }
 }

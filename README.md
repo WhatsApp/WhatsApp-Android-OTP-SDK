@@ -60,31 +60,46 @@ if(whatsAppOtpHandler.isWhatsAppOtpHandshakeSupported(context) {
 Receiving the code from WhatsApp is handled by the ``WhatsAppOtpIncomingIntentHandler`` class.
 
 
-We offer a functional interface that provides the code directly:
+We offer a functional interface that validates the handshake ID and provides the code directly:
 
 ```
-whatsAppOtpIncomingIntentHandler.processOtpCode(intent, 
-                                               (code) -> { 
+// Store the handshake ID when sending the OTP request
+UUID handshakeId = whatsAppOtpHandler.sendOtpIntentToWhatsApp(context);
+
+// Later, when receiving the intent, validate the handshake ID and process the code
+whatsAppOtpIncomingIntentHandler.processOtpCode(intent,
+                                               handshakeId.toString(),
+                                               (code) -> {
                                                   // ... use the code
                                                },
                                                (error, exception) -> {
-                                                  // handle error 
+                                                  // handle error
                                                });
 ```
 
-Utility functions are offered if you want to create your own abstraction. The following is a function to extract the code from the WhatsApp intent:
+Utility functions are offered if you want to create your own abstraction. The following function extracts the code from the WhatsApp intent after validating the handshake ID:
 
 ```
 WhatsAppOtpIncomingIntentHandler whatsAppOtpIncomingIntentHandler = new WhatsAppOtpIncomingIntentHandler();
-String code = whatsAppOtpIncomingIntentHandler.getOtpCodeFromWhatsAppIntent(whatsAppIntent);
+
+// Store the handshake ID returned when sending the OTP request
+UUID expectedHandshakeId = whatsAppOtpHandler.sendOtpIntentToWhatsApp(context);
+
+// Later, extract the code with handshake ID validation
+// Throws HandshakeIdMissingException if handshake ID is missing
+// Throws HandshakeIdInvalidFormatException if handshake ID has invalid format
+// Throws HandshakeIdMismatchException if handshake ID does not match
+String code = whatsAppOtpIncomingIntentHandler.getOtpCodeFromWhatsAppIntent(whatsAppIntent, expectedHandshakeId.toString());
 ```
 
-This function throws an ``InvalidWhatsAppOtpIntentException`` if the PendingIntent within the intent is not from WhatsApp.
-
-Additionally, you can check if the intent came from WhatsApp by using the function
+Additionally, you can check if the intent came from WhatsApp by validating the handshake ID:
 
 ```
-boolean intentIsFromWhatsApp = whatsAppOtpIncomingIntentHandler.isIntentFromWhatsApp(whatsAppIntent);
+// Store the handshake ID returned when sending the OTP request
+UUID expectedHandshakeId = whatsAppOtpHandler.sendOtpIntentToWhatsApp(context);
+
+// Later, validate the incoming intent
+boolean intentIsFromWhatsApp = whatsAppOtpIncomingIntentHandler.isIntentFromWhatsApp(whatsAppIntent, expectedHandshakeId.toString());
 ```
 
 ### Receiving debug signals
@@ -108,8 +123,6 @@ Or you can create your own abstraction by using the following function:
 ```
 DebugSignal debugSignal = whatsAppOtpIncomingIntentHandler.getDebugSignalFromWhatsAppIntent(whatsAppIntent);
 ```
-
-Similar to the function to get the code, this function throws an ``InvalidWhatsAppOtpIntentException`` if the PendingIntent within the intent is not from WhatsApp.
 
 ## License
 

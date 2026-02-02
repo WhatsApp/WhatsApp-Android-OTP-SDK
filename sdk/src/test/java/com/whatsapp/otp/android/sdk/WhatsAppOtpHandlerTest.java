@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,9 @@ import org.robolectric.RobolectricTestRunner;
 
 @RunWith(RobolectricTestRunner.class)
 public class WhatsAppOtpHandlerTest {
+
+  private static final UUID REQUEST_ID = UUID.randomUUID();
+  private static final String REQUEST_ID_KEY = "request_id";
 
   private final Context context = ApplicationProvider.getApplicationContext();
 
@@ -53,13 +57,15 @@ public class WhatsAppOtpHandlerTest {
     // setup
     WhatsAppOtpHandler waIntentHandler = new WhatsAppOtpHandler();
     // test
-    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(context, WhatsAppClientType.CONSUMER);
+    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(REQUEST_ID, context,
+            WhatsAppClientType.CONSUMER);
     // assertions
     assertThat(waIntent).isNotNull();
     assertThat(waIntent.getAction()).isEqualTo("com.whatsapp.otp.OTP_REQUESTED");
     assertThat(waIntent.getPackage()).isEqualTo("com.whatsapp");
+    assertThat(waIntent.getStringExtra(REQUEST_ID_KEY)).isEqualTo(REQUEST_ID.toString());
     String sdkVersion = waIntent.getStringExtra("SDK_VERSION");
-    assertThat(sdkVersion).isEqualTo("0.1.0_not_from_manifest");
+    assertThat(sdkVersion).isEqualTo("0.2.0_not_from_manifest");
   }
 
   @Test
@@ -67,11 +73,13 @@ public class WhatsAppOtpHandlerTest {
     // setup
     WhatsAppOtpHandler waIntentHandler = new WhatsAppOtpHandler(false);
     // test
-    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(context, WhatsAppClientType.CONSUMER);
+    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(REQUEST_ID, context,
+            WhatsAppClientType.CONSUMER);
     // assertions
     assertThat(waIntent).isNotNull();
     assertThat(waIntent.getAction()).isEqualTo("com.whatsapp.otp.OTP_REQUESTED");
     assertThat(waIntent.getPackage()).isEqualTo("com.whatsapp");
+    assertThat(waIntent.getStringExtra(REQUEST_ID_KEY)).isEqualTo(REQUEST_ID.toString());
     String sdkVersion = waIntent.getStringExtra("SDK_VERSION");
     assertThat(sdkVersion).isNull();
   }
@@ -81,11 +89,13 @@ public class WhatsAppOtpHandlerTest {
     // setup
     WhatsAppOtpHandler waIntentHandler = new WhatsAppOtpHandler();
     // test
-    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(context, WhatsAppClientType.BUSINESS);
+    Intent waIntent = waIntentHandler.sendOtpIntentToWhatsApp(REQUEST_ID, context,
+            WhatsAppClientType.BUSINESS);
     // assertions
     assertThat(waIntent).isNotNull();
     assertThat(waIntent.getAction()).isEqualTo("com.whatsapp.otp.OTP_REQUESTED");
     assertThat(waIntent.getPackage()).isEqualTo("com.whatsapp.w4b");
+    assertThat(waIntent.getStringExtra(REQUEST_ID_KEY)).isEqualTo(REQUEST_ID.toString());
   }
 
   @Test
