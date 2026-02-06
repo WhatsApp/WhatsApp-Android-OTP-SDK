@@ -30,7 +30,7 @@ public class WhatsAppOtpIntentBuilder {
 
   public static final String CALLER_INFO = "_ci_";
   public static final String SDK_VERSION = "SDK_VERSION";
-  public static final String DEFAULT_VERSION = "0.1.0_not_from_manifest";
+  public static final String DEFAULT_VERSION = "0.2.0_not_from_manifest";
 
   private boolean sendSdkVersion;
 

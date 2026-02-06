@@ -13,11 +13,14 @@ import android.content.pm.ResolveInfo;
 import androidx.annotation.NonNull;
 import com.whatsapp.otp.android.sdk.enums.WhatsAppClientType;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Class responsible for handling intents sent to WhatsApp
  */
 public class WhatsAppOtpHandler {
+
+  private static final String HANDSHAKE_ID = "request_id";
 
   private final WhatsAppOtpIntentBuilder whatsAppOtpIntentBuilder;
 
@@ -48,49 +51,99 @@ public class WhatsAppOtpHandler {
   }
 
   /**
-   * <p>Send and otp intent to both WhatsApp consumer and business app. This is the handshake step
-   * for WhatsApp authentication messages.
+   * <p>Send an OTP intent with unique request identifier to both WhatsApp consumer and business
+   * apps. This is the handshake step for WhatsApp authentication messages.</p>
    *
-   * <p>Basically an intent to WhatsApp is created with a pending intent. This pending intent is
-   * used by WhatsApp merely to validate the creator package name against the package name defined
-   * in the Authentication message template.</p>
+   * <p>An intent is created with a pending intent that WhatsApp uses to validate the creator
+   * package name against the package name defined in the Authentication message template. The
+   * included request ID allows for validating the authenticity of the received OTP code by
+   * correlating it with the specific request that was initiated.</p>
    *
    * <p>This intent is sent to WhatsApp using the "com.whatsapp.otp.OTP_REQUESTED" action</p>
    *
-   * <p>After receiving this handshake, WhatsApp will enable the autofill feature based on the
-   * message template configuration</p>
+   * <p>After receiving this handshake, WhatsApp will enable the autofill or zero tab feature based
+   * on the message template configuration. The request ID helps ensure that the OTP code received
+   * corresponds to this specific authentication request.</p>
    *
-   * @param context application context to broadcast the intent to WhatsApp.
+   * @param context Application context used to broadcast the intent to WhatsApp.
+   * @return A randomly generated UUID that was used for this OTP request. Store this value to
+   *         validate the authenticity of any received OTP codes.
+   * @throws NullPointerException if context is null
+   * @since 0.2.0
    */
-  public void sendOtpIntentToWhatsApp(final @NonNull Context context) {
+  public UUID sendOtpIntentToWhatsApp(final @NonNull Context context) {
     if (context == null) {
       throw new NullPointerException("Context cannot be null");
     }
-    sendOtpIntentToWhatsApp(context, WhatsAppClientType.CONSUMER);
-    sendOtpIntentToWhatsApp(context, WhatsAppClientType.BUSINESS);
+    UUID uuid = UUID.randomUUID();
+    sendOtpIntentToWhatsApp(uuid, context, WhatsAppClientType.CONSUMER);
+    sendOtpIntentToWhatsApp(uuid, context, WhatsAppClientType.BUSINESS);
+    return uuid;
   }
 
   /**
-   * <p>Send and otp intent to WhatsApp. This is the handshake step for WhatsApp authentication
-   * message. Basically a intent to WhatsApp is created with a pending intent. This pending intent
-   * is used by WhatsApp merely to validate the creator package name against the package name
-   * defined in the Authentication message template.</p>
+   * <p>Send an OTP intent with unique request identifier to both WhatsApp consumer and business
+   * apps. This is the handshake step for WhatsApp authentication messages.</p>
+   *
+   * <p>An intent is created with a pending intent that WhatsApp uses to validate the creator
+   * package name against the package name defined in the Authentication message template. The
+   * included request ID allows for validating the authenticity of the received OTP code by
+   * correlating it with the specific request that was initiated.</p>
    *
    * <p>This intent is sent to WhatsApp using the "com.whatsapp.otp.OTP_REQUESTED" action</p>
    *
    * <p>After receiving this handshake, WhatsApp will enable the autofill feature based on the
-   * message template configuration</p>
+   * message template configuration. The request ID helps ensure that the OTP code received
+   * corresponds to this specific authentication request.</p>
+   *
+   * @param uuid    A unique identifier for this OTP request. Used for validating the authenticity
+   *                of the received OTP code. This same ID will be sent to both consumer and
+   *                business WhatsApp applications.
+   * @param context Application context used to broadcast the intent to WhatsApp.
+   * @return The same UUID that was passed as input.
+   * @throws NullPointerException if uuid or context is null
+   * @since 0.2.0
+   */
+  public UUID sendOtpIntentToWhatsApp(final @NonNull UUID uuid, final @NonNull Context context) {
+    if (context == null) {
+      throw new NullPointerException("Context cannot be null");
+    }
+    if (uuid == null) {
+      throw new NullPointerException("uuid cannot be null");
+    }
+    sendOtpIntentToWhatsApp(uuid, context, WhatsAppClientType.CONSUMER);
+    sendOtpIntentToWhatsApp(uuid, context, WhatsAppClientType.BUSINESS);
+    return uuid;
+  }
+
+  /**
+   * <p>Send an OTP intent to WhatsApp with a unique request identifier. This is the handshake step
+   * for WhatsApp authentication message. An intent is created with a pending intent that WhatsApp
+   * uses to validate the creator package name against the package name defined in the
+   * Authentication message template.</p>
+   *
+   * <p>This intent is sent to WhatsApp using the "com.whatsapp.otp.OTP_REQUESTED" action.</p>
+   *
+   * <p>After receiving this handshake, WhatsApp will enable the autofill or zero tap feature
+   * based on the message template configuration.</p>
    *
    * <p>You can choose to send to WhatsApp consumer or business, thought is recommended to send to
    * both using {@link #sendOtpIntentToWhatsApp(Context) sendOtpIntentToWhatsApp} method</p>
    *
-   * @param context application context to broadcast the intent to WhatsApp.
-   * @param type    You can define wither consumer or business application.
-   * @return
+   * @param uuid    A unique identifier for this OTP request. Used for validating the authenticity
+   *                of the received OTP code. This value is added to the intent extras under the
+   *                HANDSHAKE_ID key.
+   * @param context Application context used to broadcast the intent to WhatsApp.
+   * @param type    Specifies whether to target WhatsApp consumer or business application.
+   * @return The intent that was sent to WhatsApp, including the request ID in extras.
+   * @since 0.2.0
    */
-  public Intent sendOtpIntentToWhatsApp(final @NonNull Context context,
-      final @NonNull WhatsAppClientType type) {
+  public Intent sendOtpIntentToWhatsApp(final @NonNull UUID uuid,
+                                        final @NonNull Context context,
+                                        final @NonNull WhatsAppClientType type) {
     Intent intent = this.whatsAppOtpIntentBuilder.create(context, type);
+    String value = uuid.toString();
+    intent.putExtra(HANDSHAKE_ID, value);
     context.sendBroadcast(intent);
     return intent;
   }

@@ -36,7 +36,7 @@ public class WhatsAppOtpIntentBuilderTest {
     PendingIntent pendingIntent = otpIntentToWhatsApp.getParcelableExtra("_ci_");
     assertThat(pendingIntent).isNotNull();
     final String sdkVersion = otpIntentToWhatsApp.getStringExtra("SDK_VERSION");
-    assertThat(sdkVersion).isEqualTo("0.1.0_not_from_manifest");
+    assertThat(sdkVersion).isEqualTo("0.2.0_not_from_manifest");
   }
 
   @Test
